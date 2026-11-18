@@ -1,0 +1,132 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "disableBypassPermissionsMode": "disable",
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/.git-credentials)",
+      "Read(~/.netrc)",
+      "Read(~/Library/Keychains/**)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(**/.env*)",
+      "Edit(**/.env*)",
+      "Write(**/.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*id_rsa*)",
+      "Read(**/*id_ed25519*)",
+      "Edit(**/data/raw/**)",
+      "Write(**/data/raw/**)",
+      "Edit(**/.agent-guard/**)",
+      "Write(**/.agent-guard/**)",
+      "Edit(**/.codex/**)",
+      "Write(**/.codex/**)",
+      "Edit(**/.cursor/hooks.json)",
+      "Write(**/.cursor/hooks.json)",
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(rm -r:*)",
+      "Bash(rm -R:*)",
+      "Bash(rm -f:*)",
+      "Bash(find * -delete*)",
+      "Bash(find * -exec rm*)",
+      "Bash(rsync * --delete*)",
+      "Bash(shred:*)",
+      "Bash(dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(diskutil:*)",
+      "Bash(sudo:*)",
+      "Bash(su:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(sftp:*)",
+      "Bash(nc:*)",
+      "Bash(security find-generic-password:*)",
+      "Bash(security find-internet-password:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(unlink:*)",
+      "Bash(mv:*)",
+      "Bash(chmod:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)",
+      "Bash(git rebase:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(pip install:*)",
+      "Bash(pip3 install:*)",
+      "Bash(python3 -m pip install:*)",
+      "Bash(conda install:*)",
+      "Bash(conda create:*)",
+      "Bash(uv add:*)",
+      "Bash(uv pip install:*)",
+      "Bash(brew install:*)",
+      "Bash(gh:*)",
+      "WebSearch"
+    ],
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(pwd)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(python3 .claude/skills/project/plan_status.py:*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "pypi.org",
+        "files.pythonhosted.org",
+        "conda.anaconda.org",
+        "repo.anaconda.com",
+        "github.com",
+        "*.githubusercontent.com"
+      ]
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/project/plan_status.py\" \"$CLAUDE_PROJECT_DIR\" --brief",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.agent-guard/guard_destructive.py\" --format claude",
+            "timeout": 30,
+            "statusMessage": "削除・上書き系コマンドを確認中..."
+          }
+        ]
+      }
+    ]
+  }
+}
